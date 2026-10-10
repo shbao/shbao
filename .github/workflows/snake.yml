@@ -6,8 +6,7 @@ name: Snake Contrib
 
 on:
   schedule:
-    - cron: "20 0 * * *" # 每天 UTC 00:20 = 北京时间 08:20（错开 metrics 的 00:00，避免同时 push 撞车）
-
+    - cron: "43 0 * * *" # 每天 UTC 00:43 = 北京时间 08:43
   # 允许手动触发
   workflow_dispatch:
 
@@ -16,9 +15,13 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 下面用 git pull --rebase，需要完整历史才可靠
+
       # 生成亮色和暗色两版贪吃蛇动画
       - name: generate github-contribution-grid-snake.svg
         uses: Platane/snk/svg-only@v3
@@ -28,12 +31,25 @@ jobs:
             dist/profile-snake-contrib/github-contribution-grid-snake.svg
             dist/profile-snake-contrib/github-contribution-grid-snake-dark.svg?palette=github-dark
 
-      # 把 dist 目录推回 main 分支
-      - name: push github-contribution-grid-snake.svg to the output branch
-        uses: crazy-max/ghaction-github-pages@v4.2.0
-        with:
-          target_branch: main
-          build_dir: dist
-          keep_history: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # 把生成的 SVG 拷回 profile-snake-contrib/ 并推上 main
+      # 特意不用 crazy-max/ghaction-github-pages：它内部只有一次 git push，没有任何重试，
+      # 一旦有别的 workflow 同时在推 main 就会直接失败（这正是 3D Contrib 首跑挂掉的原因）。
+      - name: Commit & Push
+        run: |
+          mkdir -p profile-snake-contrib
+          cp -f dist/profile-snake-contrib/*.svg profile-snake-contrib/
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add profile-snake-contrib
+          git commit -m "Update snake contribution graph" || echo "no changes to commit"
+          # 多条 workflow 都可能推 main，push 被拒时先 rebase 再重试
+          for i in 1 2 3 4 5; do
+            if git pull --rebase --autostash origin main && git push; then
+              echo "push 成功（第 $i 次尝试）"
+              exit 0
+            fi
+            echo "push 第 $i 次失败，10 秒后再试 ..."
+            sleep 10
+          done
+          echo "::error::push 连续 5 次失败"
+          exit 1

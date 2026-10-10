@@ -10,7 +10,7 @@ on:
     types:
       - started
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "13 0 * * *" # 每天 UTC 00:13 = 北京时间 08:13（只改仓库描述，不推代码，不会撞车）
   workflow_dispatch:
 
 jobs:

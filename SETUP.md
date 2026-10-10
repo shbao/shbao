@@ -120,7 +120,20 @@ git push -u origin main
 3. 等一两分钟，看它是否变绿
 4. 检查仓库里有没有多出 `profile-snake-contrib/` 目录
 
-逐个手动跑一遍，全部变绿就说明配好了。之后每天北京时间早上 8 点（UTC 00:00）自动执行。
+逐个手动跑一遍，全部变绿就说明配好了。
+
+之后每天自动执行，四条**刻意错开**（`metrics` 08:13 / `snake` 08:43 / `3D Contrib` 09:13，`fork_star` 08:13 只改描述不推代码）：
+
+| workflow | 北京时间 | 干什么 |
+|---|---|---|
+| GitHub Metrics | 08:13 | 更新 `github-metrics/*.svg` |
+| Update Fork Star | 08:13 | 更新仓库简介里的 star / fork 数（走 API，不推 git） |
+| Snake Contrib | 08:43 | 更新 `profile-snake-contrib/*.svg` |
+| 3D Contrib | 09:13 | 更新 `profile-3d-contrib/*.svg` |
+
+> **为什么不用整点、为什么间隔 30 分钟**：GitHub 的 schedule 在整点（尤其 UTC 00:00）是全网最拥堵的时刻，官方文档明确说会被延迟，实测延迟十几分钟很常见。
+> `metrics` / `snake` / `3D Contrib` 三条都要写 `main` 分支，一旦被延迟到同一时刻就会互相把 push 顶掉（`! [rejected] ... (fetch first)`）。
+> 所以这里一方面避开整点、拉开 30 分钟间隔，另一方面 `snake` 和 `3D Contrib` 的 push 都带 `git pull --rebase` 重试兜底，即使偶发撞车也能自愈。
 
 ---
 
@@ -149,6 +162,7 @@ git push -u origin main
 | 定时任务不触发 | 仓库 60 天无活动时 GitHub 会自动停用 scheduled workflow（本套每天都 commit，不会触发这条） |
 | 图片显示 404 | 对应的 workflow 还没跑过，SVG 还没生成 |
 | 定时不准时 | GitHub 的 cron 在高峰期会排队延迟，甚至跳过，属于正常现象 |
+| `! [rejected] main -> main (fetch first)` | 多个 workflow 同时在推 `main`。本套已错开定时并加了重试，偶发一次重跑即可 |
 
 ---
 
