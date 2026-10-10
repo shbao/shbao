@@ -6,7 +6,7 @@ name: Snake Contrib
 
 on:
   schedule:
-    - cron: "0 0 * * *" # 每天 UTC 00:00 = 北京时间 08:00
+    - cron: "20 0 * * *" # 每天 UTC 00:20 = 北京时间 08:20（错开 metrics 的 00:00，避免同时 push 撞车）
 
   # 允许手动触发
   workflow_dispatch:
