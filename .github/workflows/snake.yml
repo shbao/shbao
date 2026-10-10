@@ -1,0 +1,39 @@
+# 依赖开源项目 https://github.com/Platane/snk
+# 作用：把贡献图生成「贪吃蛇」动画 SVG
+# 用户名用 ${{ github.repository_owner }} 自动获取，无需手填
+
+name: Snake Contrib
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # 每天 UTC 00:00 = 北京时间 08:00
+
+  # 允许手动触发
+  workflow_dispatch:
+
+jobs:
+  generate:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      # 生成亮色和暗色两版贪吃蛇动画
+      - name: generate github-contribution-grid-snake.svg
+        uses: Platane/snk/svg-only@v3
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          outputs: |
+            dist/profile-snake-contrib/github-contribution-grid-snake.svg
+            dist/profile-snake-contrib/github-contribution-grid-snake-dark.svg?palette=github-dark
+
+      # 把 dist 目录推回 main 分支
+      - name: push github-contribution-grid-snake.svg to the output branch
+        uses: crazy-max/ghaction-github-pages@v4.2.0
+        with:
+          target_branch: main
+          build_dir: dist
+          keep_history: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

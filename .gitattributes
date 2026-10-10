@@ -1,0 +1,12 @@
+# 强制 YAML 用 LF 行尾。
+# 原因：workflow 里的 run: 多行块会被当作 shell 脚本执行，
+# 若文件是 CRLF，Linux runner 上会报 $'\r': command not found。
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.md    text eol=lf
+
+# 二进制文件不做行尾转换
+*.png   binary
+*.jpg   binary
+*.gif   binary
+*.svg   text eol=lf

@@ -1,0 +1,24 @@
+# 依赖开源项目 https://github.com/ouuan/This-repo-has-x-stars-y-forks-action
+# 作用：自动把仓库的 star / fork 数写进仓库简介
+# 需要使用 PAT（ACCESS_TOKEN）—— 默认的 GITHUB_TOKEN 没有修改仓库描述的权限
+
+name: Update Fork Star
+
+on:
+  fork:
+  watch:
+    types:
+      - started
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: This repo has x stars y forks
+        uses: ouuan/This-repo-has-x-stars-y-forks-action@v2
+        with:
+          token: ${{ secrets.ACCESS_TOKEN }}
+          template: "${{ github.repository_owner }}'s profile with <starCount> stars and <forkCount> forks 🎉"
