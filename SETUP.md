@@ -39,7 +39,7 @@ github-profile/
 ## 2. 建仓库
 
 1. GitHub 右上角 **+ → New repository**
-2. **Repository name 必须和你的用户名一模一样**，例如用户名是 `shawn`，仓库名就填 `shawn`
+2. **Repository name 必须和你的用户名一模一样**，例如用户名是 `shbao`，仓库名就填 `shbao`
 3. 可见性选 **Public**（私有仓库的 README 不会渲染到主页）
 4. 勾选 **Add a README file**
 5. Create
