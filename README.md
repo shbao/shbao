@@ -15,13 +15,6 @@
 
 ---
 
-### 📊 WakaTime
-
-<!--START_SECTION:waka-->
-<!--END_SECTION:waka-->
-
----
-
 ### 📈 GitHub 统计
 
 <p align="left">
@@ -31,10 +24,6 @@
 <p align="left">
   <img height="180" src="github-metrics/languages.indepth.svg" alt="语言分析" />
   <img height="180" src="github-metrics/habits.charts.svg" alt="编码习惯" />
-</p>
-
-<p align="left">
-  <img height="160" src="github-metrics/wakatime.svg" alt="WakaTime 统计" />
 </p>
 
 <details>
