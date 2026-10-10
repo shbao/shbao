@@ -128,10 +128,11 @@ git push -u origin main
 
 | 文件 | 改什么 |
 |---|---|
-| `README.md` | 开头那段自我介绍（名字、邮箱、方向） |
 | `README.md` | 不需要的图片区块，整段删掉即可 |
 | `metrics.yml` | 末尾被注释的 Stack Overflow 段，有账号才需要放开 |
 
+> `README.md` 开头的自我介绍（名字 / 邮箱 / 技术方向）已按 **shawn** / `shbao@outlook.com` 填好，想改直接动那几行。
+>
 > `blog.yml`（博客 RSS 抓取）已移除。以后想加回来，把博客地址给我就行。
 >
 > `waka.yml`（WakaTime 统计）及其在 `metrics.yml` 中的 WakaTime 步骤已一并移除 ——
