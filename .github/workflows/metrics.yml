@@ -1,6 +1,19 @@
 # 依赖开源项目 https://github.com/lowlighter/metrics
 # 用户名已改为 ${{ github.repository_owner }}，无需手填。
-# 需要的 Secret：METRICS_TOKEN（classic PAT，勾选 repo 权限）
+# 需要的 Secret：METRICS_TOKEN（classic PAT，勾选 repo + read:user）
+#
+# ⚠️ 2026-10-10 排查记录 —— 有 3 个图表会渲染出「Unexpected error」红框，已停用。
+#    根因是上游插件与 GitHub API 变更不兼容，不是配置写错（token 权限、仓库设置都正常）：
+#      · 成就   achievements  查询里带 `projects`（Projects classic）字段，GitHub 已废弃该字段并直接返回错误，
+#                            导致整个 GraphQL 请求失败（achievements/queries/achievements.graphql 第 50 行）
+#      · 最近动态 activity    插件读 `payload.commits`，而 GitHub 事件 API 现在返回的 PushEvent 已不含该字段
+#                            （实测 torvalds / lowlighter 的 PushEvent 也全部没有 commits），插件内部直接 TypeError
+#      · 编码习惯 habits     同上，同一个 `payload.commits` 缺失导致 TypeError: Cannot destructure 'author'
+#    这三段配置保留在文件末尾（已注释），上游修好后取消注释即可恢复。
+#
+#    另外删掉的两个（不是报错，是没数据可显示）：
+#      · 置顶仓库 repositories.pinned  需要显式配置要展示的仓库，且置顶仓库只能选公开仓库
+#      · 讨论区   discussions          仓库没开 Discussions，全是 0
 
 name: GitHub Metrics
 
@@ -42,21 +55,20 @@ jobs:
           plugin_isocalendar: yes
           plugin_isocalendar_duration: full-year
 
-      # ---------- 🈷️ 语言分析（深度） ----------
-      - name: Indepth analysis
+      # ---------- 🈷️ 语言统计 ----------
+      # 用标准模式（不 clone 仓库，直接读 GitHub 的语言元数据），比 indepth 模式快且不容易超时
+      - name: Languages
         uses: lowlighter/metrics@latest
         with:
-          filename: github-metrics/languages.indepth.svg
+          filename: github-metrics/languages.svg
           token: ${{ secrets.METRICS_TOKEN }}
           base: ""
           plugin_languages: yes
           plugin_languages_ignored: >-
             html, css, tex, less, dockerfile, makefile, qmake, lex, cmake, shell,
             gnuplot
-          plugin_languages_indepth: yes
-          plugin_languages_details: lines, bytes-size
-          plugin_languages_limit: 4
-          plugin_languages_analysis_timeout: 15
+          plugin_languages_details: bytes-size, percentage
+          plugin_languages_limit: 8
 
       # ---------- ✨ Stargazers ----------
       - name: Using chartist charts
@@ -77,18 +89,6 @@ jobs:
           base: ""
           plugin_stars: yes
           plugin_stars_limit: 10
-
-      # ---------- 💡 编码习惯 ----------
-      - name: Recent activity charts
-        uses: lowlighter/metrics@latest
-        with:
-          filename: github-metrics/habits.charts.svg
-          token: ${{ secrets.METRICS_TOKEN }}
-          base: ""
-          plugin_habits: yes
-          plugin_habits_facts: no
-          plugin_habits_charts: yes
-          config_timezone: Asia/Shanghai
 
       # ---------- 🎟️ Issue / PR 跟进 ----------
       - name: Follow-up
@@ -123,26 +123,6 @@ jobs:
           plugin_people_size: 36
           plugin_people_types: followers, following
 
-      # ---------- 📓 置顶仓库 ----------
-      - name: Pinned repositories
-        uses: lowlighter/metrics@latest
-        with:
-          filename: github-metrics/repositories.pinned.svg
-          token: ${{ secrets.METRICS_TOKEN }}
-          base: ""
-          plugin_repositories: yes
-          plugin_repositories_pinned: 2
-
-      # ---------- 💬 Discussions（没有则显示为空，可删） ----------
-      - name: GitHub Discussions
-        uses: lowlighter/metrics@latest
-        with:
-          filename: github-metrics/discussions.svg
-          token: ${{ secrets.METRICS_TOKEN }}
-          base: ""
-          plugin_discussions: yes
-          plugin_discussions_categories_limit: 8
-
       # ---------- 📆 提交日历（全历史） ----------
       - name: Full history calendar
         uses: lowlighter/metrics@latest
@@ -153,35 +133,76 @@ jobs:
           plugin_calendar: yes
           plugin_calendar_limit: 0
 
-      # ---------- 🏆 成就 ----------
-      - name: Compact display
-        uses: lowlighter/metrics@latest
-        with:
-          filename: github-metrics/achievements.compact.svg
-          token: ${{ secrets.METRICS_TOKEN }}
-          base: ""
-          plugin_achievements: yes
-          plugin_achievements_only: >-
-            polyglot, stargazer, sponsor, deployer, member, maintainer, developer,
-            scripter, packager, explorer, infographile, manager
-          plugin_achievements_display: compact
-          plugin_achievements_threshold: X
+      # ================================================================
+      # 以下 3 段暂不启用：上游插件与 GitHub API 变更不兼容，会输出
+      # 「Unexpected error」红框。等 lowlighter/metrics 修复后取消注释即可恢复。
+      # ================================================================
 
-      # ---------- 📰 最近动态 ----------
-      - name: Recent activity
-        uses: lowlighter/metrics@latest
-        with:
-          filename: github-metrics/activity.svg
-          token: ${{ secrets.METRICS_TOKEN }}
-          base: ""
-          plugin_activity: yes
-          plugin_activity_limit: 5
-          plugin_activity_days: 0
-          plugin_activity_filter: issue, pr, release, fork, review, ref/create
+      # ---------- 🏆 成就（停用：查询引用已废弃的 Projects classic 字段） ----------
+      # - name: Compact display
+      #   uses: lowlighter/metrics@latest
+      #   with:
+      #     filename: github-metrics/achievements.compact.svg
+      #     token: ${{ secrets.METRICS_TOKEN }}
+      #     base: ""
+      #     plugin_achievements: yes
+      #     plugin_achievements_only: >-
+      #       polyglot, stargazer, sponsor, deployer, member, maintainer, developer,
+      #       scripter, packager, explorer, infographile, manager
+      #     plugin_achievements_display: compact
+      #     plugin_achievements_threshold: X
+
+      # ---------- 📰 最近动态（停用：GitHub 事件 API 不再返回 payload.commits） ----------
+      # - name: Recent activity
+      #   uses: lowlighter/metrics@latest
+      #   with:
+      #     filename: github-metrics/activity.svg
+      #     token: ${{ secrets.METRICS_TOKEN }}
+      #     base: ""
+      #     plugin_activity: yes
+      #     plugin_activity_limit: 5
+      #     plugin_activity_days: 0
+      #     plugin_activity_filter: issue, pr, release, fork, review, ref/create
+
+      # ---------- 💡 编码习惯（停用：同一个 payload.commits 缺失问题） ----------
+      # - name: Recent activity charts
+      #   uses: lowlighter/metrics@latest
+      #   with:
+      #     filename: github-metrics/habits.charts.svg
+      #     token: ${{ secrets.METRICS_TOKEN }}
+      #     base: ""
+      #     plugin_habits: yes
+      #     plugin_habits_facts: no
+      #     plugin_habits_charts: yes
+      #     config_timezone: Asia/Shanghai
+
+      # ================================================================
+      # 以下 2 段按需启用（默认没数据，不显示比显示空图好）
+      # ================================================================
+
+      # ---------- 📓 置顶仓库（先在主页置顶几个公开仓库，再去掉注释） ----------
+      # - name: Pinned repositories
+      #   uses: lowlighter/metrics@latest
+      #   with:
+      #     filename: github-metrics/repositories.pinned.svg
+      #     token: ${{ secrets.METRICS_TOKEN }}
+      #     base: ""
+      #     plugin_repositories: yes
+      #     plugin_repositories_pinned: 2
+
+      # ---------- 💬 Discussions（仓库开启 Discussions 后再启用） ----------
+      # - name: GitHub Discussions
+      #   uses: lowlighter/metrics@latest
+      #   with:
+      #     filename: github-metrics/discussions.svg
+      #     token: ${{ secrets.METRICS_TOKEN }}
+      #     base: ""
+      #     plugin_discussions: yes
+      #     plugin_discussions_categories_limit: 8
 
       # ---------- 🗨️ Stack Overflow ----------
       # 需要你的 Stack Overflow 数字 user id（看个人主页 URL 里的数字）
-      # 没有账号就把这一段整块删掉
+      # 没有账号就别启用
       # - name: Top answers from stackoverflow
       #   uses: lowlighter/metrics@latest
       #   with:

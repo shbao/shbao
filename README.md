@@ -20,8 +20,7 @@
 </p>
 
 <p align="left">
-  <img height="180" src="github-metrics/languages.indepth.svg" alt="语言分析" />
-  <img height="180" src="github-metrics/habits.charts.svg" alt="编码习惯" />
+  <img height="180" src="github-metrics/languages.svg" alt="语言统计" />
 </p>
 
 <details>
@@ -38,19 +37,11 @@
 </p>
 
 <p align="left">
-  <img src="github-metrics/achievements.compact.svg" alt="成就" />
-</p>
-
-<p align="left">
-  <img src="github-metrics/activity.svg" alt="最近动态" />
-</p>
-
-<p align="left">
   <img src="github-metrics/stars.svg" alt="最近 Star" />
 </p>
 
 <p align="left">
-  <img src="github-metrics/repositories.pinned.svg" alt="置顶仓库" />
+  <img src="github-metrics/stargazers.chartist.svg" alt="Stargazers" />
 </p>
 
 <p align="left">

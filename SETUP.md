@@ -142,7 +142,7 @@ git push -u origin main
 | 文件 | 改什么 |
 |---|---|
 | `README.md` | 不需要的图片区块，整段删掉即可 |
-| `metrics.yml` | 末尾被注释的 Stack Overflow 段，有账号才需要放开 |
+| `metrics.yml` | 末尾那段被注释的区块，说明见第 8 节 |
 
 > `README.md` 开头的自我介绍（名字 / 邮箱 / 技术方向）已按 **shawn** / `shbao@outlook.com` 填好，想改直接动那几行。
 >
@@ -163,6 +163,25 @@ git push -u origin main
 | 图片显示 404 | 对应的 workflow 还没跑过，SVG 还没生成 |
 | 定时不准时 | GitHub 的 cron 在高峰期会排队延迟，甚至跳过，属于正常现象 |
 | `! [rejected] main -> main (fetch first)` | 多个 workflow 同时在推 `main`。本套已错开定时并加了重试，偶发一次重跑即可 |
+| 图上显示 **Unexpected error** | 见下方专门说明 |
+| 语言统计显示 **No push activity found** | 没抓到可分析的仓库。本套已改用标准模式，会读 GitHub 的语言元数据；若你只往私有仓库提交，也可能仍为空 |
+
+### 关于图上的「Unexpected error」
+
+2026-10-10 排查确认：**这是上游 `lowlighter/metrics` 与 GitHub API 变更不兼容，不是本仓库配置错**
+（token 权限 `read:user, repo`、仓库设置都正常，同在跑的其他 8 张图全部正常）。
+问题出在 3 个插件上，`metrics.yml` 里这三段已注释停用：
+
+| 图 | 插件 | 根因 | 证据 |
+|---|---|---|---|
+| 成就 | `achievements` | 查询里带 `projects`（Projects classic）字段，GitHub 已废弃该字段并直接返回错误，整个 GraphQL 请求被判失败 | `achievements/queries/achievements.graphql` 第 50 行 |
+| 最近动态 | `activity` | 插件读 `payload.commits`，而 **GitHub 事件 API 现在返回的 PushEvent 里已经没有 `commits` 字段** | 实测 `torvalds` 84 条、`lowlighter` 34 条 PushEvent，`commits` 全部缺失 |
+| 编码习惯 | `habits` | 同上，`payload.commits` 缺失 → 插件内部 `TypeError: Cannot destructure property 'author'` | 运行日志 |
+
+因为 `lowlighter/metrics` 已处于维护停滞状态（作者 burnout，主仓库最后更新 2026-05），
+短期内不会修。上游修复后，把 `metrics.yml` 末尾对应段落的注释去掉、并在 `README.md` 加回图片引用即可。
+另外 `repositories.pinned`（需要先在主页置顶公开仓库）和 `discussions`（仓库没开 Discussions）也一并注释了
+—— 它们不报错，只是显示空图。
 
 ---
 
