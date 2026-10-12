@@ -1,15 +1,36 @@
+### 🐍 我的贡献被吃掉了
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="profile-snake-contrib/github-contribution-grid-snake-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="profile-snake-contrib/github-contribution-grid-snake.svg" />
+  <img alt="贡献贪吃蛇" src="profile-snake-contrib/github-contribution-grid-snake.svg" />
+</picture>
+
+---
+
 ### Hi there 👋
 
-我是 **shawn**，一名嵌入式固件工程师。
+我是 **shawn**，一名光通信行业的嵌入式固件工程师。
 
-- 🔧 日常工作：MicroBlaze / STM32 / FPGA / RTOS
-- 🛠 折腾过的板子：ALINX AU7P、STM32G431/G491、AM243X、Tiva
-- 🌱 正在啃：DDR 数据完整性、OTDR 信号反卷积
+- 🔧 技术与平台：ARM · MCU · SoC · RISC · FreeRTOS · RT-Thread · TI-RTOS
+- 🌱 正在啃：MicroBlaze · 相干 OTDR / OCM
 - 📫 找我：shbao@outlook.com
 
-> 我们正在让这个世界变得更加美好，通过代码的重复使用和延展构建完美体系。
+> 代码跑在硅片上，信号跑在光纤里。
 >
-> **We're making the world a better place. Through constructing elegant hierarchies for maximum code reuse and extensibility.**
+> **Code runs on silicon, light runs through fiber.**
+
+---
+
+### 💼 工作内容
+
+- 基于 Cortex-M4 / M33 的 RT-Thread 嵌入式开发
+- 基于易灵思（Efinix）软核的小型可插拔 OTDR 模块嵌入式软件开发
+- 基于 Xilinx MicroBlaze 的驱动开发
+- OTDR 事件定位算法设计与仿真
+- 应用于 OCM 的 DMA 控制与采集系统开发
+- 其他光通信模块的软件设计
+- 闲时写一写测试 GUI 和脚本
 
 ---
 
@@ -57,16 +78,6 @@
 </p>
 
 </details>
-
----
-
-### 🐍 我的贡献被吃掉了
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="profile-snake-contrib/github-contribution-grid-snake-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="profile-snake-contrib/github-contribution-grid-snake.svg" />
-  <img alt="贡献贪吃蛇" src="profile-snake-contrib/github-contribution-grid-snake.svg" />
-</picture>
 
 ---
 
